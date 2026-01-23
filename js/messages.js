@@ -172,13 +172,34 @@ function createMessageCard(message) {
     // Process message text to convert filenames to clickable links
     const processedText = linkifyFilenames(message.text);
 
+    // Build the image reference section if imageFilename exists
+    let imageSection = '';
+    if (message.imageFilename) {
+        imageSection = `
+            <div class="message-image-ref">
+                <span class="image-ref-label">Related image:</span>
+                <a href="#" class="image-ref-link" data-filename="${escapeHtml(message.imageFilename)}">${escapeHtml(message.imageFilename)}</a>
+            </div>
+        `;
+    }
+
     card.innerHTML = `
         <div class="message-header">
             <span class="message-author">${escapeHtml(message.author)}</span>
             <span class="message-date">${formattedDate}</span>
         </div>
         <div class="message-text">${processedText}</div>
+        ${imageSection}
     `;
+
+    // Add click handler for image reference link
+    if (message.imageFilename) {
+        const imageLink = card.querySelector('.image-ref-link');
+        imageLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSimpleLightbox(message.imageFilename);
+        });
+    }
 
     return card;
 }

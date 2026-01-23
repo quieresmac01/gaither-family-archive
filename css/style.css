@@ -1039,6 +1039,32 @@ body {
     color: #555;
 }
 
+.message-image-ref {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0ede8;
+    font-size: 0.95rem;
+}
+
+.image-ref-label {
+    color: #999;
+    margin-right: 8px;
+}
+
+.image-ref-link {
+    color: #8b7355;
+    text-decoration: none;
+    font-weight: 600;
+    border-bottom: 1px solid #d4c4b0;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.image-ref-link:hover {
+    color: #1a1a1a;
+    border-bottom-color: #1a1a1a;
+}
+
 .filename-link {
     color: #8b7355;
     text-decoration: none;
