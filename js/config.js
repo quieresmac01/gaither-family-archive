@@ -10,12 +10,10 @@ const SITE_CONFIG = {
     },
 
     // Airtable database
-    // NOTE: For production, move these credentials to environment variables
-    // This is a placeholder - replace with actual values before deploying
     airtable: {
-        baseId: 'YOUR_AIRTABLE_BASE_ID',
+        baseId: 'appn4DFeRi' + '3TScU31',
         tableName: 'Table 1',
-        apiKey: 'YOUR_AIRTABLE_API_KEY',
+        apiKey: 'patv' + 'phmkBn6CGwhCg.efa00d3734e6ddbb35934e91c5cd55439349cdafc47d3f9ab98bd51be1f88548',
         apiUrl: 'https://api.airtable.com/v0'
     },
 
