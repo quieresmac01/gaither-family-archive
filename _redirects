@@ -1,0 +1,4 @@
+# Netlify redirects file
+/catalog  /catalog.html  200
+/slideshow  /slideshow.html  200
+/messages  /messages.html  200

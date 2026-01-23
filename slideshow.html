@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slideshow - Gaither Family Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <a href="index.html" class="back-link">&larr; Home</a>
+            <h1>Random Slideshow</h1>
+        </header>
+
+        <nav class="tab-navigation">
+            <a href="catalog.html" class="tab">
+                <span class="tab-title">Catalog</span>
+            </a>
+            <a href="slideshow.html" class="tab active">
+                <span class="tab-title">Slideshow</span>
+            </a>
+            <a href="messages.html" class="tab">
+                <span class="tab-title">Family Messages</span>
+            </a>
+        </nav>
+
+        <!-- Slideshow Controls -->
+        <div class="slideshow-controls">
+            <div class="speed-control">
+                <label for="speedSelect">Transition Speed:</label>
+                <select id="speedSelect">
+                    <option value="2000">Fast (2s)</option>
+                    <option value="4000" selected>Medium (4s)</option>
+                    <option value="6000">Slow (6s)</option>
+                    <option value="10000">Very Slow (10s)</option>
+                </select>
+            </div>
+            <button id="playPauseBtn" class="control-btn">
+                <span id="playPauseText">Play</span>
+            </button>
+            <button id="shuffleBtn" class="control-btn secondary">
+                <span id="shuffleText">Shuffle: OFF</span>
+            </button>
+        </div>
+
+        <!-- Slideshow Display -->
+        <div class="slideshow-container">
+            <div id="slideshowImage" class="slideshow-image">
+            </div>
+            <div id="slideshowInfo" class="slideshow-info">
+                <p id="slideshowFilename"></p>
+                <p id="slideshowCounter"></p>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="slideshow-progress">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/slideshow.js"></script>
+</body>
+</html>

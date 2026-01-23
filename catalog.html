@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog - Gaither Family Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <a href="index.html" class="back-link">&larr; Home</a>
+            <h1>Family Archive Catalog</h1>
+        </header>
+
+        <nav class="tab-navigation">
+            <a href="catalog.html" class="tab active">
+                <span class="tab-title">Catalog</span>
+            </a>
+            <a href="slideshow.html" class="tab">
+                <span class="tab-title">Slideshow</span>
+            </a>
+            <a href="messages.html" class="tab">
+                <span class="tab-title">Family Messages</span>
+            </a>
+        </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search..." />
+            <button id="clearSearch">Clear</button>
+        </div>
+
+        <!-- Share Bar -->
+        <div class="share-bar" id="shareBar" style="display: none;">
+            <div class="share-info">
+                <span id="selectedCount">0</span> images selected (max 10)
+            </div>
+            <div class="share-actions">
+                <button id="shareEmail" class="share-btn">Share via Email</button>
+                <button id="clearSelection" class="clear-selection-btn">Clear Selection</button>
+            </div>
+        </div>
+
+        <!-- Settings Bar -->
+        <div class="settings-bar">
+            <div class="settings-group">
+                <label for="itemsPerPage">Items per page:</label>
+                <select id="itemsPerPage">
+                    <option value="10">10</option>
+                    <option value="25" selected>25</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+            <div class="info">
+                <span id="itemCount">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Image Grid -->
+        <div id="imageGrid" class="image-grid">
+            <div class="loading">Loading catalog...</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <button id="firstPage" class="page-btn">First</button>
+            <button id="prevPage" class="page-btn">Previous</button>
+            <span id="pageInfo" class="page-info">Page 1 of 1</span>
+            <button id="nextPage" class="page-btn">Next</button>
+            <button id="lastPage" class="page-btn">Last</button>
+            <div class="page-jump">
+                <label for="pageInput">Go to page:</label>
+                <input type="number" id="pageInput" min="1" placeholder="#" />
+                <button id="pageGo">Go</button>
+            </div>
+        </div>
+
+        <!-- Lightbox Modal -->
+        <div id="lightbox" class="lightbox">
+            <span class="close">&times;</span>
+            <div class="lightbox-content">
+                <img id="lightboxImage" src="" alt="">
+                <div class="nav-buttons">
+                    <button class="nav-btn prev-btn" id="prevImage">&#10094; Previous</button>
+                    <button class="nav-btn next-btn" id="nextImage">Next &#10095;</button>
+                </div>
+            </div>
+            <div class="lightbox-info">
+                <p id="imageFilename"></p>
+                <p id="imageNumber"></p>
+            </div>
+
+            <!-- Image Comments Section -->
+            <div class="image-comments-section">
+                <div class="comments-header">
+                    <h3>Information & Comments</h3>
+                    <button id="toggleComments" class="toggle-comments-btn">Show Comments (<span id="commentCount">0</span>)</button>
+                </div>
+
+                <div id="commentsContainer" class="comments-container" style="display: none;">
+                    <!-- Add Comment Form -->
+                    <div class="add-comment-form">
+                        <input type="text" id="commentAuthor" placeholder="Your name" maxlength="50" />
+                        <textarea id="commentText" placeholder="Share what you know about this image (people, places, dates, events...)..." rows="3" maxlength="500"></textarea>
+                        <button id="submitComment" class="submit-comment-btn">Add Information</button>
+                    </div>
+
+                    <!-- Comments List -->
+                    <div id="imageCommentsList" class="comments-list">
+                        <!-- Comments will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

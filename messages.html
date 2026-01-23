@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Messages - Gaither Family Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <a href="index.html" class="back-link">&larr; Home</a>
+            <h1>Family Messages</h1>
+        </header>
+
+        <nav class="tab-navigation">
+            <a href="catalog.html" class="tab">
+                <span class="tab-title">Catalog</span>
+            </a>
+            <a href="slideshow.html" class="tab">
+                <span class="tab-title">Slideshow</span>
+            </a>
+            <a href="messages.html" class="tab active">
+                <span class="tab-title">Family Messages</span>
+            </a>
+        </nav>
+
+        <!-- Message Form -->
+        <section class="message-form-section">
+            <h2>Share a Comment or a Memory here</h2>
+            <form id="messageForm" class="message-form">
+                <div class="form-group">
+                    <label for="authorName">Your Name</label>
+                    <input type="text" id="authorName" name="authorName" required placeholder="J. Gaither">
+                </div>
+                <div class="form-group">
+                    <label for="messageText">Your Message</label>
+                    <textarea id="messageText" name="messageText" required placeholder="Add what you know about this image to become searchable information" rows="5"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="imageFilename">Related Image (optional)</label>
+                    <input type="text" id="imageFilename" name="imageFilename" placeholder="e.g., 1234.jpg">
+                    <small>If this memory relates to a specific photo, enter the filename</small>
+                </div>
+                <button type="submit" class="submit-btn">Post Message</button>
+            </form>
+        </section>
+
+        <!-- Messages Display -->
+        <section class="messages-section">
+            <!-- Message Search -->
+            <div class="message-search-container">
+                <input type="text" id="messageSearchInput" placeholder="Search messages by name or content..." />
+                <button id="clearMessageSearch">Clear</button>
+            </div>
+
+            <h2>Family Wall</h2>
+
+            <div id="messagesContainer" class="messages-container">
+                <!-- Messages will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/config.local.js"></script>
+    <script src="js/airtable-api.js"></script>
+    <script src="js/messages.js"></script>
+</body>
+</html>

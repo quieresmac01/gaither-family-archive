@@ -1,0 +1,27 @@
+# Images folder (hosted on Cloudflare R2)
+images/
+
+# Local credentials (NEVER commit!)
+js/config.local.js
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build files
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Netlify
+.netlify/
