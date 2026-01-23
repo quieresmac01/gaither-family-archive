@@ -34,7 +34,12 @@ async function handleSubmit(e) {
 
     const author = authorNameInput.value.trim();
     const text = messageTextInput.value.trim();
-    const imageFilename = document.getElementById('imageFilename')?.value.trim() || null;
+    let imageFilename = document.getElementById('imageFilename')?.value.trim() || null;
+
+    // Auto-add .jpg extension if user didn't include one
+    if (imageFilename && !imageFilename.match(/\.(jpg|jpeg|png|gif|tiff|tif|webp)$/i)) {
+        imageFilename = imageFilename + '.jpg';
+    }
 
     if (!author || !text) {
         alert('Please fill in all fields');
