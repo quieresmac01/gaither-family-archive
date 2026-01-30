@@ -13,7 +13,7 @@ const SITE_CONFIG = {
     airtable: {
         baseId: 'appn4DFeRi' + '3TScU31',
         tableName: 'Table 1',
-        apiKey: 'patv' + 'phmkBn6CGwhCg.efa00d3734e6ddbb35934e91c5cd55439349cdafc47d3f9ab98bd51be1f88548',
+        apiKey: 'patQbQZTpWI' + 'ZTdPly.a18aee9d1cebf8d4ca37b7ed5cfa030e66db90e4a01e4b02b91f69907917d120',
         apiUrl: 'https://api.airtable.com/v0'
     },
 
