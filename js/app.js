@@ -14,9 +14,11 @@ let itemsPerPage = CONFIG.defaultItemsPerPage;
 let currentImageIndex = 0;
 let searchTimeout = null;
 let currentImageFilename = null;
-let imageComments = {};
+let imageComments = {};          // All comments indexed by filename (for search)
+let currentImageCommentsList = []; // Comments for currently viewed image (for display)
 let userName = '';
 let selectedImages = new Set();
+let commentsLoaded = false;      // Track if comments have been fetched from Airtable
 
 // DOM Elements
 const imageGrid = document.getElementById('imageGrid');
@@ -61,8 +63,8 @@ document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
     loadUserName();
-    loadImageComments();
     await loadCatalog();
+    await loadAllImageComments(); // Fetch from Airtable for search index
     setupEventListeners();
 
     // Check if there's a share parameter in URL
@@ -175,6 +177,14 @@ function handleSearch(e) {
                 // Search in object names
                 if (item.objects && Object.keys(item.objects).some(obj =>
                     obj.toLowerCase().includes(searchTerm)
+                )) {
+                    return true;
+                }
+
+                // Search in user-submitted comments (from Airtable)
+                if (imageComments[item.filename]?.some(comment =>
+                    comment.text.toLowerCase().includes(searchTerm) ||
+                    comment.author.toLowerCase().includes(searchTerm)
                 )) {
                     return true;
                 }
@@ -334,17 +344,48 @@ function updateLightboxImage() {
     nextImageBtn.style.display = currentImageIndex < filteredData.length - 1 ? 'block' : 'none';
 }
 
-function showPrevImage() {
+async function showPrevImage() {
     if (currentImageIndex > 0) {
         currentImageIndex--;
         updateLightboxImage();
+        await loadCommentsForCurrentImage();
     }
 }
 
-function showNextImage() {
+async function showNextImage() {
     if (currentImageIndex < filteredData.length - 1) {
         currentImageIndex++;
         updateLightboxImage();
+        await loadCommentsForCurrentImage();
+    }
+}
+
+// Helper to load comments when navigating between images
+async function loadCommentsForCurrentImage() {
+    const item = filteredData[currentImageIndex];
+    const requestedFilename = item.filename;
+    currentImageFilename = requestedFilename;
+    currentImageCommentsList = [];
+    updateCommentCount(currentImageFilename);
+
+    try {
+        const comments = await AirtableAPI.getCommentsForImage(requestedFilename);
+        // Only update if we're still on the same image (user hasn't navigated away)
+        if (currentImageFilename === requestedFilename) {
+            currentImageCommentsList = comments;
+            updateCommentCount(currentImageFilename);
+            // Re-render if comments section is visible
+            if (commentsContainer.style.display !== 'none') {
+                renderImageComments();
+            }
+        }
+    } catch (error) {
+        console.error('Error loading comments for image:', error);
+        // Only update if we're still on the same image
+        if (currentImageFilename === requestedFilename) {
+            currentImageCommentsList = imageComments[requestedFilename] || [];
+            updateCommentCount(currentImageFilename);
+        }
     }
 }
 
@@ -380,21 +421,32 @@ function saveUserName(name) {
     localStorage.setItem('gaither_username', name);
 }
 
-// Load/Save image comments from localStorage
-function loadImageComments() {
-    const saved = localStorage.getItem('gaither_image_comments');
-    if (saved) {
-        try {
-            imageComments = JSON.parse(saved);
-        } catch (e) {
-            console.error('Error loading comments:', e);
-            imageComments = {};
+// Load all image comments from Airtable (for search index)
+async function loadAllImageComments() {
+    try {
+        imageComments = await AirtableAPI.getAllImageComments();
+        commentsLoaded = true;
+        console.log('Image comments loaded for search');
+    } catch (error) {
+        console.error('Error loading image comments from Airtable:', error);
+        // Fallback to localStorage if Airtable fails
+        const saved = localStorage.getItem('gaither_image_comments');
+        if (saved) {
+            try {
+                imageComments = JSON.parse(saved);
+            } catch (e) {
+                imageComments = {};
+            }
         }
     }
 }
 
-function saveImageComments() {
-    localStorage.setItem('gaither_image_comments', JSON.stringify(imageComments));
+// Refresh comments in search index after new comment is added
+function addCommentToSearchIndex(filename, comment) {
+    if (!imageComments[filename]) {
+        imageComments[filename] = [];
+    }
+    imageComments[filename].push(comment);
 }
 
 // Toggle comments section visibility
@@ -402,24 +454,24 @@ function toggleCommentsSection() {
     const isVisible = commentsContainer.style.display !== 'none';
     if (isVisible) {
         commentsContainer.style.display = 'none';
-        const count = getImageComments(currentImageFilename).length;
+        const count = currentImageCommentsList.length;
         toggleCommentsBtn.textContent = `Show Comments (${count})`;
     } else {
         commentsContainer.style.display = 'block';
-        const count = getImageComments(currentImageFilename).length;
+        const count = currentImageCommentsList.length;
         toggleCommentsBtn.textContent = `Hide Comments (${count})`;
         renderImageComments();
     }
 }
 
-// Get comments for specific image
+// Get comments for specific image (from local cache)
 function getImageComments(filename) {
-    return imageComments[filename] || [];
+    return currentImageCommentsList || [];
 }
 
 // Update comment count display
 function updateCommentCount(filename) {
-    const count = getImageComments(filename).length;
+    const count = currentImageCommentsList.length;
     commentCount.textContent = count;
 
     // Update toggle button text
@@ -431,8 +483,8 @@ function updateCommentCount(filename) {
     }
 }
 
-// Submit new comment
-function submitImageComment() {
+// Submit new comment to Airtable
+async function submitImageComment() {
     const author = commentAuthor.value.trim();
     const text = commentText.value.trim();
 
@@ -449,45 +501,55 @@ function submitImageComment() {
         return;
     }
 
-    // Save username for future use
-    saveUserName(author);
+    // Disable button while submitting
+    submitCommentBtn.disabled = true;
+    submitCommentBtn.textContent = 'Submitting...';
 
-    // Create comment object
-    const comment = {
-        author: author,
-        text: text,
-        timestamp: new Date().toISOString(),
-        filename: currentImageFilename
-    };
+    try {
+        // Save username for future use
+        saveUserName(author);
 
-    // Add to comments array
-    if (!imageComments[currentImageFilename]) {
-        imageComments[currentImageFilename] = [];
+        // Submit to Airtable
+        await AirtableAPI.submitImageComment(author, text, currentImageFilename);
+
+        // Create comment object for local state
+        const comment = {
+            author: author,
+            text: text,
+            timestamp: new Date().toISOString()
+        };
+
+        // Add to search index immediately (so it's searchable right away)
+        addCommentToSearchIndex(currentImageFilename, comment);
+
+        // Add to current display list
+        currentImageCommentsList.unshift(comment);
+
+        // Clear form
+        commentText.value = '';
+
+        // Update display
+        updateCommentCount(currentImageFilename);
+        renderImageComments();
+
+    } catch (error) {
+        console.error('Error submitting comment:', error);
+        alert('Error submitting comment. Please try again.');
+    } finally {
+        // Re-enable button
+        submitCommentBtn.disabled = false;
+        submitCommentBtn.textContent = 'Add Information';
     }
-    imageComments[currentImageFilename].push(comment);
-
-    // Save to localStorage
-    saveImageComments();
-
-    // Clear form
-    commentText.value = '';
-
-    // Update display
-    updateCommentCount(currentImageFilename);
-    renderImageComments();
 }
 
 // Render comments for current image
 function renderImageComments() {
-    const comments = getImageComments(currentImageFilename);
+    const comments = currentImageCommentsList;
 
     if (comments.length === 0) {
         imageCommentsList.innerHTML = '<p class="no-comments">No information yet. Be the first to share what you know about this image!</p>';
         return;
     }
-
-    // Sort by timestamp (newest first)
-    comments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     imageCommentsList.innerHTML = comments.map(comment => {
         const date = new Date(comment.timestamp);
@@ -514,7 +576,7 @@ function renderImageComments() {
 }
 
 // Update lightbox to load comments when opened
-function openLightbox(index) {
+async function openLightbox(index) {
     currentImageIndex = index;
     const item = filteredData[currentImageIndex];
     currentImageFilename = item.filename;
@@ -525,11 +587,22 @@ function openLightbox(index) {
 
     // Reset comments section
     commentsContainer.style.display = 'none';
+    currentImageCommentsList = []; // Clear previous
     updateCommentCount(currentImageFilename);
 
     // Pre-fill username if saved
     if (userName) {
         commentAuthor.value = userName;
+    }
+
+    // Load comments for this specific image from Airtable
+    try {
+        currentImageCommentsList = await AirtableAPI.getCommentsForImage(currentImageFilename);
+        updateCommentCount(currentImageFilename);
+    } catch (error) {
+        console.error('Error loading comments for image:', error);
+        // Fallback to cached comments if available
+        currentImageCommentsList = imageComments[currentImageFilename] || [];
     }
 }
 
